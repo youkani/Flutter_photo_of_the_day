@@ -1,17 +1,46 @@
-# photo_of_the_day_bunicheva
+# ФЛабораторная работа №8. Асинхронность в Dart и Flutter. Создание приложения «Фото дня»
 
-A new Flutter project.
+Flutter-приложение для просмотра случайных фотографий собак и пейзажей.
 
-## Getting Started
+## Информация об авторе
+* **Автор:** Буничева Алёна
+* **Группа:** ИСП-242
 
-This project is a starting point for a Flutter application.
+## Стек и версии
+* **Flutter:** 3.50.0
+* **Dart:** 3.14.0 (stable)
+* **Платформа:** Web (Google Chrome)
+* **Пакеты:** `http: ^1.6.0`
 
-A few resources to get you started if this is your first Flutter project:
+![Скриншот приложения](img/step2_bunicheva.png)
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Запуск
+1. `git clone https://github.com/youkani/Flutter_photo_of_the_day.git`
+2. `cd Flutter_photo_of_the_day`
+3. `flutter pub get`
+4. `flutter run -d chrome`
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Что изучили
+* Работу с асинхронным программированием в Dart с помощью `Future`, `async` и `await`.
+* Выполнение сетевых GET-запросов через пакет `http` и парсинг JSON-ответов функцией `jsonDecode()`.
+* Обработку ошибок в асинхронных функциях с помощью блока `try/catch`.
+* Управление состояниями интерфейса во Flutter (`_isLoading`, `_imageUrl`, `_errorMessage`) с использованием `setState()`.
+* Подключение и отображение локальных ресурсов (`assets`) с помощью виджета `Image.asset()`.
+
+## Ответы на контрольные вопросы
+
+**1. Что такое `Future<T>`? Чем отличается от обычного возвращаемого значения?**
+`Future<T>` это объект, который обещает вернуть значение типа T в будущем. Он возвращается сразу в незавершённом состоянии, позволяя программе продолжать работу, пока операция выполняется в фоне.
+
+**2. Что делает `await`? Блокирует ли он весь поток выполнения?**
+await приостанавливает выполнение функции до тех пор, пока `Future` не завершится и не вернёт результат.
+
+**3. Зачем `setState()` вызывается дважды в `_fetchPhoto()`?**
+Первый вызов `setState()` устанавливает `_isLoading = true` и сбрасывает старые данные, чтобы Flutter перерисовал экран и показал пользователю индикатор загрузки. Второй вызов `setState()` в конце метода устанавливает `_isLoading = false`, чтобы скрыть индикатор загрузки и отобразить полученную фотографию или сообщение об ошибке.
+
+**4. Почему кнопке передаётся `_fetchPhoto` без скобок, а не `_fetchPhoto()`?**
+Запись `_fetchPhoto` без скобок передаёт в параметр `onPressed` ссылку на саму функцию, чтобы Flutter вызвал её только в момент нажатия на кнопку. Если написать `_fetchPhoto()` со скобками, функция выполнится сразу при построении виджета, а не по клику пользователя.
+
+**5. Чем `Image.network()` отличается от `Image.asset()`?**
+`Image.network()` загружает и отображает изображение из интернета по указанному URL-адресу. `Image.asset()` берёт изображение из локальных файлов, встроенных в приложение и прописанных в `pubspec.yaml`.
+
