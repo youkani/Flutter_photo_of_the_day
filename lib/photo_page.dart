@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-enum PhotoType {dog, landscapes}
+enum PhotoType { dog, landscapes }
+
 class PhotoPage extends StatefulWidget {
   const PhotoPage({super.key});
 
@@ -11,6 +13,15 @@ class PhotoPage extends StatefulWidget {
 }
 
 class _PhotoPageState extends State<PhotoPage> {
+  final List<String> _localPhotos = [
+    'assets/images/photo1.jpg',
+    'assets/images/photo2.jpg',
+    'assets/images/photo3.jpg',
+    'assets/images/photo4.jpg',
+    'assets/images/photo5.jpg',
+    'assets/images/photo6.jpg',
+  ];
+
   String? _imageUrl;
   bool _isLoading = false;
   String? _errorMessage;
@@ -22,24 +33,14 @@ class _PhotoPageState extends State<PhotoPage> {
       _errorMessage = null;
       _imageUrl = null;
     });
-    try {
-      String url;
-      http.Response response;
 
-      if (_animalType == PhotoType.dog) {
-        url = 'https://dog.ceo/api/breeds/image/random';
-        response = await http.get(Uri.parse(url));
-        Map<String, dynamic> data = jsonDecode(
-          response.body,
-        );
-        _imageUrl = data['message'];
-      } else {
-        final random =
-            DateTime.now().millisecondsSinceEpoch;
-        _imageUrl = 'https://picsum.photos/seed/$random/800/800';
-      }
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      final randomIndex =
+          DateTime.now().millisecondsSinceEpoch % _localPhotos.length;
+      _imageUrl = _localPhotos[randomIndex];
     } catch (e) {
-      _errorMessage = 'Не удалось загрузить фото\nПроверьте подключение к интернету.';
+      _errorMessage = 'Ошибка загрузки фото';
     }
 
     setState(() {
@@ -59,9 +60,9 @@ class _PhotoPageState extends State<PhotoPage> {
           const SizedBox(height: 20),
           _buildAnimalToggle(),
           const SizedBox(height: 20),
-          _buildContent(),
-          const SizedBox(height: 20),
           _buildButton(),
+          const SizedBox(height: 20),
+          _buildContent(),
           const SizedBox(height: 20),
         ],
       ),
@@ -102,6 +103,7 @@ class _PhotoPageState extends State<PhotoPage> {
       ],
     );
   }
+
   Widget _buildContent() {
     if (_isLoading) {
       return const Expanded(
@@ -117,14 +119,53 @@ class _PhotoPageState extends State<PhotoPage> {
             child: Text(
               _errorMessage!,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.red,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.red),
             ),
           ),
         ),
       );
     }
+    if (_imageUrl != null) {
+      return Expanded(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
+              _imageUrl!,
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return const Expanded(
+      child: Center(
+        child: Text(
+          'Нажмите кнопку\nчтобы загрузить фото',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButton() {
+    String label = _animalType == PhotoType.dog
+        ? '🐶 Новая собака'
+        : '🌄 Новый пейзаж';
+
+    return ElevatedButton(
+      onPressed: _isLoading ? null : _fetchPhoto,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 24,
+          vertical: 12,
+        ),
+        child: Text(label, style: const TextStyle(fontSize: 16)),
+      ),
+    );
   }
 }
